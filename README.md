@@ -1,56 +1,84 @@
-# Welcome to your Expo app 👋
+# Bell
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**A bell for discipline.**
 
-## Get started
+Bell is an Android-first time scheduler for study, work, and routines. Give each session a start and an end, then let Bell cue you when to begin, switch tasks, or stop. For example, if Polity ends at 09:45 and React starts at 09:45, one alert announces both.
 
-1. Install dependencies
+## What works today
 
-   ```bash
-   npm install
-   ```
+- The Today screen shows the local schedule, the active session's progress, and what comes next.
+- You can add, edit, and remove sessions. Enter a start time and either an end time or a duration. Overlaps are blocked, and back-to-back sessions are allowed.
+- Sessions are saved locally by date. The current interface plans the current day.
+- Installed Android builds schedule start and end alerts, use a bundled wake-up-style tone, and provide a **Test alarm sound** button. The tone plays once per alert.
 
-2. Start the app
+Built with Expo SDK 58, React Native, TypeScript, Expo Router, AsyncStorage, and Expo Notifications.
 
-   ```bash
-   npx expo start
-   ```
+## Run locally
 
-In the output, you'll find options to open the app in a
+Use Node.js 24.3 or later in the Node 24 series and npm. Run these commands from the project root.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```sh
+npm ci
+npx expo start
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+| Task | Command or action |
+| --- | --- |
+| Open in Expo Go on Android | Keep the phone and laptop on the same Wi-Fi and scan the terminal QR code in Expo Go. |
+| Connect when the local network blocks the phone | `npx expo start --go --tunnel` |
+| Restart Metro and clear its cache | `npx expo start --clear` |
+| Open the browser preview | `npm run web` or press `w` in the Expo terminal. |
+| Open a configured Android emulator | `npm run android` or press `a` in the Expo terminal. |
 
-### Other setup steps
+Expo Go is useful for testing the UI, editing, and local storage. Its Android alerts use the standard notification sound and can arrive late. The browser preview has its own local schedule. Use Bell's APK for the bundled tone and exact-alarm testing.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Build and install the Android APK
 
-## Learn more
+The EAS `preview` profile uses internal distribution and produces an APK for direct installation.
 
-To learn more about developing your project with Expo, look at the following resources:
+```sh
+npx eas-cli@latest login
+npx eas-cli@latest build --platform android --profile preview
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Open the completed EAS build link on your phone, download the APK, and install it. Launch **Bell** from its own app icon. This route needs no ADB setup. Build a new APK after changes to native dependencies, the launcher icon, permissions, or the bundled sound. [Expo APK installation guide](https://docs.expo.dev/build-reference/apk/#physical-device)
 
-## Join the community
+### Verify alarms on a phone
 
-Join our community of developers creating universal apps.
+1. Create a session starting three minutes from now with a two-minute duration.
+2. If Bell prompts you, allow **notifications** and **exact alarms**. Return to Bell and look for **Upcoming alarms scheduled**.
+3. Tap **Test alarm sound** to test playback immediately. If the test notification appears silently, check the phone's **Alarm** volume and Bell's **Session alarm tone** category in Android notification settings.
+4. Lock the phone and check for a start alert and an end alert. To verify a handoff, add a second session that starts at the first session's end and check for one combined alert.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Development checks
+
+```sh
+npx expo lint
+npx tsc --noEmit
+npx expo-doctor
+```
+
+Use `npx expo install <package>` to add Expo-compatible packages. Run `npx expo install --fix` when Expo reports dependency versions that need aligning. Keep native configuration in `app.json` and config plugins.
+
+## Project roadmap
+
+| Phase | Scope | Milestone |
+| --- | --- | --- |
+| 1 · Working prototype | Today timeline, session editor, local storage, and Android start/end alerts. | The prototype is in place. Continue testing alarm delivery on physical devices. |
+| 2 · Reliable alarms and alert controls | Verify locked-screen and background delivery. Add a stop action for a ringing alarm, per-session alert toggles, and a pause-until-time option for Bell's alerts. Explain notification and exact-alarm permissions in the app. | Users can tell whether alerts are enabled, silence a session, and resume alerts at a chosen time. |
+| 3 · Scheduler and calendar | Plan future dates, browse a calendar, and create recurring or reusable schedules. Keep overlap checks and back-to-back handoffs. | Users can plan and review an entire week from Bell. |
+| 4 · UI and focus tools | Refine the timeline and editor with clearer hierarchy, accessible controls, and useful animation. Explore an optional timed focus mode for other apps' interruptions, subject to Android permissions and with previous settings restored when the session ends. | Adding, checking, and adjusting a session feels quick on a small screen. |
+| 5 · Beta and launch | Run a small Android beta, measure alarm reliability and repeat use, then prepare onboarding, support, a privacy policy, and the Play Store listing. | Ship the core scheduler after it meets the device-test checklist and beta users can set up alerts independently. |
+| 6 · Business validation | Learn which planning features users return for and might pay for. Keep the basic schedule and alerts simple while evaluating optional upgrades such as advanced recurring schedules or sync. | Use beta feedback to decide whether a paid offering makes sense. |
+
+## Project structure
+
+| Path | Purpose |
+| --- | --- |
+| `src/app/` | Expo Router screens and layouts |
+| `src/components/` | Session editor, time input, and animated bell mascot |
+| `src/hooks/use-schedule-clock.ts` | Local clock updates for the Today screen |
+| `src/utils/` | Session validation, schedule storage, and alert scheduling |
+| `app.json`, `eas.json` | Expo configuration and EAS build profiles |
+
+See [LICENSE](LICENSE).
